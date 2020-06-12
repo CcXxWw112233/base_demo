@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>跨域通信</title>
+</head>
+
+<body>
+    <h1>主页面</h1>
+    <iframe height="800" id="child" width="1000"
+        src="http://192.168.1.48:8088/index.html?orgId=1205014363291914240&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzgyNzUzODgsInVzZXJJZCI6IjExOTM4Mzc3NTQyMjg4MDU2MzIifQ.WH17_0Fn9lt3PVBj0p1_B5RjJF3VGhiVAdsyDL-O6G0"></iframe>
+    <div>
+        <h2>主页面接收消息区域</h2>
+        <span id="message"></span>
+    </div>
+</body>
+<script>
+    const src = 'http://192.168.1.48:8088/index.html?orgId=1205014363291914240&token=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE1NzgyNzUzODgsInVzZXJJZCI6IjExOTM4Mzc3NTQyMjg4MDU2MzIifQ.WH17_0Fn9lt3PVBj0p1_B5RjJF3VGhiVAdsyDL-O6G0'
+    window.onload = function () {
+        document.getElementById('child')
+            .contentWindow.postMessage("主页面消息", src)//父向子传递
+    }
+    window.addEventListener('message', function (event) {//父获取子传递的消息
+        const message = event.data
+        const message_head = 'map_board_change_'
+        if (message.indexOf(message_head) != -1) {
+            const board_id = message.replace(message_head, '')
+            console.log('hahaha', board_id)
+        }
+    }, false)
+
+    //子界面方法
+    // listenPostMessage = () => {
+    //     window.addEventListener('message', function (event) {//子获取父消息
+    //         console.log('ssssaaas_child', event);
+    //         console.log("ssssaaas_child_子收到" + event.origin + "消息：" + event.data)
+    //         // console.log(top)
+    //         window.top.postMessage("子页面消息收到", 'http://localhost:63342/base/iframe_post.html')//子向父消息
+    //     }, false);
+    // }
+    // window.top.postMessage(`map_board_change_${board_id}`, 'http://localhost:8664/#/technological/simplemode/workbench')
+</script>
+
+</html>

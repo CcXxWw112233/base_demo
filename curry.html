@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+<!-- <div style="width: 100%; background: blue;">
+    <div class='content' style="margin: 0 au;"> 
+        <div>交易</div>
+        <div>原创</div>
+        <div>版权</div>
+    </div>
+</div> -->
+</body>
+<script type="text/javascript">
+    window.onload = function () {
+        function curry(fn, argLen, currArgs) {
+            return function () {
+                console.log("arguments:", arguments, arguments.length)
+                var args = [].slice.call(arguments);
+                console.log("args:", args)
+                // 首次调用时未提供最后一个参数
+                if (currArgs !== undefined) {
+                    args = args.concat(currArgs);
+                }
+                // 递归出口
+                if (args.length == argLen) {
+                    return fn.apply(this, args);
+                } else {
+                    return curry(fn, argLen, args);
+                }
+            }
+        }
+
+        function sumOf(a, b, c, d) {
+            return a + b + c + d;
+        }
+
+        // 改造普通函数，返回柯里函数
+        var sum = curry(sumOf, 4);
+        sum(1,2)(3,4)
+    }
+</script>
+
+</html>

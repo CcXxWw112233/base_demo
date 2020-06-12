@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<!--<style>-->
+    <!--.box svg line.top,-->
+    <!--.box svg line.bottom {-->
+        <!--stroke-dasharray: 330 240;  /*dash的宽度为330，dash间的间距为240*/-->
+    <!--}-->
+    <!--.box svg line.left,-->
+    <!--.box svg line.right {-->
+        <!--stroke-dasharray: 490 400;-->
+    <!--}-->
+
+
+    <!--.box:hover svg line.top {-->
+        <!-- -webkit-transform: translateX(-600px);-->
+        <!--transform: translateX(-600px);-->
+    <!--}-->
+    <!--.box:hover svg line.bottom {-->
+        <!-- -webkit-transform: translateX(600px);-->
+        <!--transform: translateX(600px);-->
+    <!--}-->
+    <!--.box:hover svg line.left {-->
+        <!-- -webkit-transform: translateY(920px);-->
+        <!--transform: translateY(920px);-->
+    <!--}-->
+    <!--.box:hover svg line.right {-->
+        <!-- -webkit-transform: translateY(-920px);-->
+        <!--transform: translateY(-920px);-->
+    <!--}-->
+
+<!--</style>-->
+<!--<div class="box demo1">-->
+    <!--<svg xmlns="http://www.w3.org/2000/svg" >-->
+        <!--<line x1="10" y1="10" x2="110" y2="10" stroke="red"/>-->
+        <!--<line x1="10" y1="10" x2="110" y2="40" stroke="green" />-->
+        <!--<line x1="10" y1="10" x2="110" y2="70" stroke="blue" />-->
+    <!--</svg>-->
+    <!--<h3>D</h3>-->
+    <!--<span>Broccoli, Asparagus, Curry</span>-->
+<!--</div>-->
+<style>
+    .out {
+        position: relative;
+    }
+
+    .inner{
+        position: absolute;
+        top: 1px;
+        left: 1px;
+        background-color: white;
+        width: 116px;
+        height: 36px;
+        text-align: center;
+        line-height: 38px;
+        border-radius: 6px;
+    }
+</style>
+<!--<div class="out">-->
+    <svg width="120" height="40">
+        <rect
+                x="2" y="2"
+                height="36" width="116"
+                rx="8" ry="8"
+                stroke-width="2"
+                stroke="red"
+                fill="white"/>
+    </svg>
+    <!--<div class="inner">sss</div>-->
+
+<!--</div>-->
+</body>
+<script type="text/javascript">
+    const tag_total = 5
+    const date_total = 1 //总天数
+    const height = 40
+    const width_ceil = 24
+
+    const cal_line_length = height * 2 + date_total * width_ceil * 2 //矩形周长
+    const a_tag_line_lenght = cal_line_length / tag_total //平均每个标签占用的线条长度
+</script>
+</html>

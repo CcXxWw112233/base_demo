@@ -16,8 +16,8 @@
         this.name = name || 'Animal';
         // 实例方法
         this.sleep = function () {
-
             console.log(this.name + '正在睡觉！');
+            return this.name + '正在睡觉！2'
         }
 
     }
@@ -26,30 +26,51 @@
         console.log(this.name + '正在吃：' + food);
     };
 
-    function Cat() { }
-    Cat.prototype = new Animal();
-    Cat.prototype.name = 'cat';
-    //　Test Code
-    var cat = new Cat();
-    console.log(cat.name);
-    console.log(cat.eat('fish'));
-    console.log(cat.sleep());
-    console.log(cat instanceof Animal); //true
-    console.log(cat instanceof Cat); //true
-    console.log(Cat.__proto__)
-    console.log('---------------------------')
+    // function Cat() { }
+    // Cat.prototype = new Animal();
+    // Cat.prototype.name = 'cat';
+    // //　Test Code
+    // var cat = new Cat();
+    // console.log(cat.name);
+    // console.log(cat.eat('fish'));
+    // console.log(cat.sleep());
+    // console.log(cat instanceof Animal); //true
+    // console.log(cat instanceof Cat); //true
+    // console.log(Cat.__proto__)
+    // console.log('---------------------------')
 
 
-    function Cat2(name) {
+    // function Cat2(name) {
+    //     Animal.call(this);
+    //     this.name = name || 'Tom';
+    // }
+    // // Test Code
+    // var cat2 = new Cat2();
+    // console.log(cat2.name);
+    // console.log(cat2.sleep());
+    // console.log(cat2 instanceof Animal); // false
+    // console.log(cat2 instanceof Cat2); // true
+
+    console.log('------------------')
+    function Cat(name) {
         Animal.call(this);
         this.name = name || 'Tom';
     }
+    Cat.prototype = Animal.prototype;
+
+    // (function () {
+    //     // 创建一个没有实例方法的类
+    //     var Super = function () { };
+    //     Super.prototype = Animal.prototype;
+    //     //将实例作为子类的原型
+    //     Cat.prototype = new Super();
+    // })();
     // Test Code
-    var cat2 = new Cat2();
-    console.log(cat2.name);
-    console.log(cat2.sleep());
-    console.log(cat2 instanceof Animal); // false
-    console.log(cat2 instanceof Cat2); // true
+    var cat = new Cat();
+    console.log(cat.name);
+    console.log(cat.sleep());
+    console.log(cat instanceof Animal); // true
+    console.log(cat instanceof Cat); //true
 </script>
 
 </html>

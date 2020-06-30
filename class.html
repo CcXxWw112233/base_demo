@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    function Animal(name) {
+        // 属性
+        this.name = name || 'Animal';
+        // 实例方法
+        this.sleep = function () {
+
+            console.log(this.name + '正在睡觉！');
+        }
+
+    }
+    // 原型方法
+    Animal.prototype.eat = function (food) {
+        console.log(this.name + '正在吃：' + food);
+    };
+
+    function Cat() { }
+    Cat.prototype = new Animal();
+    Cat.prototype.name = 'cat';
+    //　Test Code
+    var cat = new Cat();
+    console.log(cat.name);
+    console.log(cat.eat('fish'));
+    console.log(cat.sleep());
+    console.log(cat instanceof Animal); //true
+    console.log(cat instanceof Cat); //true
+    console.log(Cat.__proto__)
+    console.log('---------------------------')
+
+
+    function Cat2(name) {
+        Animal.call(this);
+        this.name = name || 'Tom';
+    }
+    // Test Code
+    var cat2 = new Cat2();
+    console.log(cat2.name);
+    console.log(cat2.sleep());
+    console.log(cat2 instanceof Animal); // false
+    console.log(cat2 instanceof Cat2); // true
+</script>
+
+</html>

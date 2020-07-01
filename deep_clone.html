@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>深克隆</title>
+</head>
+
+<body>
+    <script>
+        function deepClone(obj) {
+            var newObj = obj instanceof Array ? [] : {};
+            for (var item in obj) {
+                var temple = typeof obj[item] == 'object' ? deepClone(obj[item]) : obj[item];
+                newObj[item] = temple;
+            }
+            return newObj;
+        }
+        function A(age) {
+            this.age = age
+        }
+
+        const a = { id: 11, info: { name: '张三', age: '24' } }
+        const b = deepClone(a)
+
+        b.id = 13
+        b.info.name = '李四'
+        console.log(1, a)
+        console.log(2, b)
+
+        const c = [{ id: 1, name: '1' }, { id: 2, name: '2' }]
+        const d = deepClone(c)
+        d[0].name = 32
+        console.log(3, c)
+        console.log(4, d)
+
+        function deepClone(obj) {
+            let newobj = obj instanceof Array ? [] : {}
+            for (let item in obj) {
+                let temp = typeof obj[item] == 'object' ? deepClone(obj[item]) : obj[item];
+                newobj[item] = temp
+            }
+
+            return newobj
+        }
+
+    </script>
+</body>
+
+</html>

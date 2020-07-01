@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>监听属性变化</title>
+</head>
+
+<body>
+
+</body>
+<script>
+    var user = {
+        name: '张三',
+        id: 1
+    }
+
+    function listenProperty(obj, key) {
+        Object.defineProperty(obj, key, {
+            set: function (value, key2) {
+                console.log(value, key2)
+                return this
+            },
+            get: function (value, key2) {
+                return this
+            }
+        })
+    }
+    // listenProperty(user, 'name')
+    user.name = 'ss'
+    console.log(user)
+</script>
+
+</html>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>图片加载</title>
+</head>
+
+<body>
+    <div id="mypic">onloading……</div>
+
+
+</body>
+
+<script type="text/javascript" defer>
+    window.onload = function () {
+        console.log(document.getElementById("mypic").innerHTML)
+        document.getElementById("mypic").innnerHTML = 's'
+        var obj = new Image();
+        obj.src = "http://www.phpernote.com/uploadfiles/editor/201107240502201179.jpg";
+        obj.onload = function () {
+            console.log('图片的宽度为：' + obj.width + '；图片的高度为：' + obj.height + '路径：');
+            document.getElementById("mypic").innerHTML = "<img src='" + this.src + "' />";
+        }
+    }
+
+</script>
+
+</html>

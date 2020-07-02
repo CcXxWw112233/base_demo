@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>实现promise</title>
+</head>
+
+<body>
+
+</body>
+<!-- https://github.com/forthealllight/blog/issues/4 -->
+<script>
+    function MyPromise(constructor) {
+        let self = this
+        const status_obj = {
+            pending: 'pending',
+            resolved: 'resolved',
+            rejected: 'rejected'
+        }
+        self.status_obj = status_obj
+        self.status = status_obj.pending
+        self.value = undefined
+        self.reason = undefined
+
+        function resolve(value) {
+            if (self.status === status_obj.pending) {
+                self.value = value
+                self.status = status_obj.resolved
+            }
+        }
+        function reject(reason) {
+            if (self.status === status_obj.pending) {
+                self.reason = reason
+                self.status = status_obj.rejected
+            }
+        }
+
+        try {
+            constructor(resolve, reject)
+        } catch (e) {
+            reject(e)
+        }
+
+    }
+    MyPromise.prototype.then = function (onFulfilled, onRejected) {
+        let self = this
+        switch (self.status) {
+            case self.status_obj.resolved:
+                onFulfilled(self.value)
+                break
+            case self.status_obj.rejected:
+                onRejected(self.reason)
+                break
+            default:
+                break
+        }
+    }
+
+    var p = new MyPromise((resolve, reject) => {
+        resolve(1)
+
+    })
+    p.then(res => {
+        console.log(res)
+    }).then(res2 => {
+        console.log(res2, 'www')
+
+    })
+</script>
+
+</html>

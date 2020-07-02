@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>对象多继承</title>
+</head>
+
+<body>
+    <script>
+        //对象深克隆
+        function deepClone(obj) {
+            let newobj = obj instanceof Array ? [] : {}
+            for (let item in obj) {
+                let temp = typeof obj[item] == 'object' ? deepClone(obj[item]) : obj[item];
+                newobj[item] = temp
+            }
+
+            return newobj
+        }
+
+        //对象多继承
+        function extendsMultiple() {
+            const target = arguments[0]
+            const args = arguments
+            for (let obj of args) {
+                for (let property in obj) {
+                    const temp = typeof obj[property] == 'object' ? deepClone(obj[property]) : obj[property]
+                    target[property] = temp
+                }
+            }
+            return target
+        }
+
+        function A(name) {
+            this.name = name
+        }
+        A.prototype.getName = function () {
+            console.log('this name', this.name)
+            return this.name
+        }
+
+        function B(age, family_no) {
+            this.age = age
+            this.info = {
+                family_no
+            }
+        }
+        B.prototype.getAge = function () {
+            console.log('this age', this.age)
+            return this.age
+        }
+
+
+        function C(doing) {
+            this.doing = doing
+        }
+
+        console.log('-------------------对象多继承')
+        const a = new A('张三')
+        const b = new B('24', 20)
+        const c = extendsMultiple({ job: 'web developer' }, a, b)
+        c.age = 22
+        c.info.family_no = 30
+        console.log(a, b, c)
+
+
+        // 构造函数多继承(多个构造函数的方法)
+        function mixins() {
+            const target = arguments[0]
+            const args = arguments
+        }
+
+    </script>
+</body>
+
+</html>

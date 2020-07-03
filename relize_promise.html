@@ -23,17 +23,24 @@
         self.status = status_obj.pending
         self.value = undefined
         self.reason = undefined
-
+        self.onFulfilledArray = []
+        self.onRejectedArray = []
         function resolve(value) {
             if (self.status === status_obj.pending) {
                 self.value = value
                 self.status = status_obj.resolved
+                self.onFulfilledArray.forEach(func => {
+                    func(self.value)
+                });
             }
         }
         function reject(reason) {
             if (self.status === status_obj.pending) {
                 self.reason = reason
                 self.status = status_obj.rejected
+                self.onRejectedArray.forEach(func => {
+                    func(self.reason)
+                });
             }
         }
 
@@ -46,27 +53,66 @@
     }
     MyPromise.prototype.then = function (onFulfilled, onRejected) {
         let self = this
+        let promise2 = undefined
         switch (self.status) {
+            case self.status_obj.pending:
+                promise2 = new MyPromise(function (resolve, reject) {
+                    self.onFulfilledArray.push(function () {
+                        try {
+                            let temp = onFulfilled(self.value)
+                            resolve(temp)
+                        } catch (e) {
+                            reject(e)
+                        }
+                    })
+                    self.onRejectedArray.push(function () {
+                        try {
+                            let temp = onRejected(self.reason)
+                            reject(temp)
+                        } catch (e) {
+                            reject(e)
+                        }
+                    })
+                })
+                break
             case self.status_obj.resolved:
-                onFulfilled(self.value)
+                promise2 = new myPromise(function (resolve, reject) {
+                    try {
+                        let temple = onFullfilled(self.value);
+                        //将上次一then里面的方法传递进下一个Promise的状态
+                        resolve(temple);
+                    } catch (e) {
+                        reject(e);//error catch
+                    }
+                })
                 break
             case self.status_obj.rejected:
-                onRejected(self.reason)
+                promise2 = new myPromise(function (resolve, reject) {
+                    try {
+                        let temple = onRejected(self.reason);
+                        //将then里面的方法传递到下一个Promise的状态里
+                        resolve(temple);
+                    } catch (e) {
+                        reject(e);
+                    }
+                })
                 break
             default:
                 break
         }
+        return promise2
     }
 
     var p = new MyPromise((resolve, reject) => {
-        resolve(1)
-
+        setTimeout(() => {
+            resolve(1)
+        }, 1000)
     })
     p.then(res => {
         console.log(res)
+        return 2
     }).then(res2 => {
-        console.log(res2, 'www')
-
+        console.log(res2)
     })
 </script>
 

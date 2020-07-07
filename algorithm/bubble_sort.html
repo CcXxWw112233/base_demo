@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>冒泡排序</title>
+</head>
+
+<body>
+</body>
+<script>
+    // 传统冒泡
+    // function bubbleSort(arr) {
+    //     console.time('传统冒泡排序耗时');
+    //     const len = arr.length
+    //     for (let i = 0; i < len; i++) {
+    //         for (let j = 0; j < len - 1 - i; j++) {
+    //             if (arr[j] > arr[j + 1]) {
+    //                 const temp = arr[j + 1]
+    //                 arr[j + 1] = arr[j]
+    //                 arr[j] = temp
+    //             }
+    //         }
+    //     }
+    //     console.timeEnd('传统冒泡排序耗时');
+    //     return arr
+    // }
+
+    // 改进
+    function bubbleSort2(arr) {
+        console.time('改进后冒泡排序耗时');
+        var i = arr.length - 1;  //初始时,最后位置保持不变
+        while (i > 0) {
+            var pos = 0; //每趟开始时,无记录交换
+            for (var j = 0; j < i; j++)
+                if (arr[j] > arr[j + 1]) {
+                    pos = j; //记录交换的位置
+                    var tmp = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = tmp;
+                }
+            i = pos; //为下一趟排序作准备
+        }
+        console.timeEnd('改进后冒泡排序耗时');
+        return arr;
+    }
+    function bubbleSort3(arr) {
+        var low = 0;
+        var high = arr.length - 1; //设置变量的初始值
+        var tmp, j;
+        console.time('2.改进后冒泡排序耗时');
+        while (low < high) {
+            for (j = low; j < high; ++j) //正向冒泡,找到最大者
+                if (arr[j] > arr[j + 1]) {
+                    tmp = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = tmp;
+                }
+            --high;                 //修改high值, 前移一位
+            for (j = high; j > low; --j) //反向冒泡,找到最小者
+                if (arr[j] < arr[j - 1]) {
+                    tmp = arr[j]; arr[j] = arr[j - 1]; arr[j - 1] = tmp;
+                }
+            ++low;                  //修改low值,后移一位
+        }
+        console.timeEnd('2.改进后冒泡排序耗时');
+        return arr3;
+    }
+
+    var arr = [44, 3, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+    // bubbleSort(arr)
+    bubbleSort3(arr)
+    // console.log('2', bubbleSort2(arr))
+</script>
+
+</html>

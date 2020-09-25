@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>动态规划算法</title>
+  </head>
+  <body>
+    <h2>题目：</h2>
+    <p>
+      很久很久以前，有一位国王拥有5座金矿，每座金矿的黄金储量
+      不同，需要参与挖掘的工人人数也不同。例如有的金矿储量是500kg
+      黄金，需要5个工人来挖掘；有的金矿储量是200kg黄金，需要3个工 人来挖掘……
+      如果参与挖矿的工人的总数是10。每座金矿要么全挖，要么不
+      挖，不能派出一半人挖取一半的金矿。要求用程序求出，要想得到尽
+      可能多的黄金，应该选择挖取哪几座金矿？
+    </p>
+    <p>
+      500kg/5人<br />
+      400kg/5人<br />
+      350kg/3人<br />
+      300kg/4人<br />
+      200kg/3人<br />
+    </p>
+  </body>
+  <script type="text/javascript">
+    // 参考自    //  https://segmentfault.com/a/1190000012829866
+    /**
+     *   获得金矿最优收益
+     * @param w 工人数量
+     * @param p 金矿开采所需的工人数量
+     * @param g 金矿储量
+     */
+    function getOptimize(w, p = [], g = []) {
+      const results = new Array(w + 1).fill(0);
+      for (let i = 1; i < g.length; i++) {
+        for (let j = w; j >= 1; j--) {
+          if (j >= p[i - 1]) {
+            results[j] = Math.max(results[j], results[j - p[i - 1]] + g[i - 1]);
+          }
+        }
+      }
+      return results[w];
+    }
+    const opt = getOptimize(10, [3, 5, 5, 3, 4], [350, 400, 500, 200, 300]);
+    console.log("sss", opt);
+  </script>
+</html>

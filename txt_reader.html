@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>读取TXT文件</title>
+</head>
+
+<body>
+    <h2>操作指引</h2>
+    <ol>
+        <li>txt文件另存为, 选择编码方式为ANSI,另存后的文件直接查看可能中文乱码,无需担心。(此方式为解决中文乱码，如果txt文件中没有中文，则忽略)</li>
+        <li> ie下需要配置，参考https://www.seotest.cn/jishu/34844.html</li>
+    </ol>
+    <h2>输入路径。例如：E:\base_demo\test.txt。</h2>
+    <input type="text" id="input_path" style="width: 400px;height:30px;margin-right: 8px" placeholder="入口汇总文件路径">
+    <input placeholder="目标输出文件路径" id='output_path' style="width: 400px;height:30px;margin-right: 8px" />
+    <button id="ok" style="height: 36px; width: 60px">确认</button>
+    <h2>输出结果</h2>
+
+    <div id="text"></div>
+
+    <script>
+        var fso = new ActiveXObject("Scripting.FileSystemObject");
+        document.getElementById('ok').addEventListener('click', function () {
+            var input_path = document.getElementById('input_path').value
+            var output_path = document.getElementById('output_path').value
+            if (!input_path) {
+                alert('请输入读取文件的路径')
+                return
+            }
+            if (!output_path) {
+                alert('请输入输出文件的路径')
+                return
+            }
+            document.getElementById('text').innerHTML = '正在输出,请耐心等待...'
+            setTimeout(function () {
+                input_path = input_path.replace(/\\/g, '\\') //'C:\\Users\\HUAWEI\\Desktop\\test_input.txt'  // 
+                output_path = output_path.replace(/\\/g, '\\') //'C:\\Users\\HUAWEI\\Desktop\\test_ouput.txt'//  //
+                var paths_array = []
+
+                try {
+                    var f = fso.OpenTextFile(input_path, 1, false); //入口文件对象
+                    var f_1 = fso.OpenTextFile(output_path, 8, true); //出口文件对象
+                    while (!f.AtEndOfStream) {
+                        var temp = f.ReadLine().split(); //读取一行数据并按空格分割
+                        if (!!!temp[0]) continue
+                        paths_array.push(temp[0])
+                    }
+                    readerFile(paths_array, f_1)
+                } catch (err) {
+                    alert(err.message)
+                }
+            }, 300)
+
+        })
+
+        function readerFile(paths_array, f_1) {
+            for (let i = 0, len = paths_array.length; i < len; i++) {
+                try {
+                    const path = paths_array[i].replace(/\\/g, '\\')
+                    const f_2_ = fso.OpenTextFile(path, 1, false); //入口文件对象
+                    while (!f_2_.AtEndOfStream) {
+                        let temp = f_2_.ReadLine().split(); //读取一行数据并按空格分割
+                        if (!!!temp[0]) continue
+                        outputFile(f_1, temp[0])
+                    }
+                    document.getElementById('text').innerHTML = '已完成'
+                } catch (err) {
+                    alert(err.message + ':' + paths_array[i])
+                }
+            }
+        }
+
+        function outputFile(fileObj, text) {
+            try {
+                if (text.indexOf('ISE') != -1) {
+                    fileObj.writeLine(text);
+                }
+            } catch (err) {
+                alert(err.message)
+            }
+        }
+    </script>
+</body>
+
+</html>
+<!-- if (!!!temp[0]) continue
+if (temp[0].indexOf('ISE') != -1) {
+    outputFile(f_1, temp[0])
+    for (i = 0; i < temp.length; i++) {
+        str += temp[i] + "&nbsp;";
+    }
+    str += "<br>";
+} -->
+
+<!-- // document.getElementById("text").innerHTML = str; -->

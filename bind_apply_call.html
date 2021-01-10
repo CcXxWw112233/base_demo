@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>手写call, apply, bind</title>
+  </head>
+  <body></body>
+  <script>
+    const A = {
+      a: 1,
+      name: "",
+      age: "",
+      hanlde: function (name, age) {
+        console.log(this.a);
+        this.name = name;
+        this.age = age;
+      },
+    };
+    const B = {
+      a: 2,
+      name: "",
+      age: "",
+      hanlde: function (name, age) {
+        console.log("B", this.a);
+      },
+    };
+
+    Function.prototype.mycall = function (thisArg, ...args) {
+      const fn = Symbol("fn");
+      thisArg = thisArg || window;
+      thisArg[fn] = this;
+      console.log(this);
+      const result = thisArg[fn](...args);
+      delete thisArg[fn];
+      console.log("result", result);
+      return result;
+    };
+
+    Function.prototype.myapply = function (thisArg, args) {
+      const fn = Symbol("fn");
+      thisArg = thisArg || window;
+      thisArg[fn] = this;
+      const result = thisArg[fn](...args);
+      delete thisArg[fn];
+      return result;
+    };
+    // https://blog.csdn.net/q3254421/article/details/82999718
+    Function.prototype.myBind = function (thisArg, ...args) {
+      var self = this;
+      console.log("self", self, this, this instanceof self);
+      // new优先级
+      var fbound = function () {
+        self.apply(
+          this instanceof self ? this : thisArg,
+          args.concat(Array.prototype.slice.call(arguments))
+        );
+      };
+      // 继承原型上的属性和方法
+      fbound.prototype = Object.create(self.prototype);
+
+      return fbound;
+    };
+    const D = A.hanlde.myBind(B, "张三", "22");
+    D();
+    console.log("A", A);
+    console.log("B", B);
+  </script>
+</html>

@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>计数排序</title>
+  </head>
+  <body></body>
+  <script>
+    function countingSort(arr, maxValue) {
+      var bucket = new Array(maxValue + 1),
+        sortedIndex = 0,
+        arrLen = arr.length,
+        bucketLen = maxValue + 1;
+      for (var i = 0; i < arrLen; i++) {
+        if (!bucket[arr[i]]) {
+          bucket[arr[i]] = 0;
+        }
+        bucket[arr[i]]++;
+      }
+      for (var j = 0; j < bucketLen; j++) {
+        while (bucket[j] > 0) {
+          arr[sortedIndex++] = j;
+          bucket[j]--;
+        }
+      }
+      return arr;
+    }
+    var arr = [3, 44, 38, 5, 47, 15, 36, 26, 27, 2, 46, 4, 19, 50, 48];
+    console.log(countingSort(arr, 50));
+  </script>
+</html>

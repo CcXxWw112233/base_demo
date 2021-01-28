@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染有很多数据的列表</title>
+  </head>
+  <body>
+    <!--参考自 https://blog.csdn.net/weixin_43889562/article/details/113128957?utm_medium=distribute.pc_category.none-task-blog-hot-7.nonecase&depth_1-utm_source=distribute.pc_category.none-task-blog-hot-7.nonecase&request_id= -->
+    <ul id="urlss" style="height: 500px; overflow: scroll"></ul>
+  </body>
+  <!-- <script>
+    const $UL = document.querySelector("ul");
+    let size = 0;
+    const myList = getList();
+
+    // 生成数据
+    function getList() {
+      let list = [];
+      for (let i = 0; i < 5005000; i++) {
+        list.push(i);
+      }
+      return list;
+    }
+
+    function render(list) {
+      let tempBox = document.createDocumentFragment();
+      list.map(function (data) {
+        let li = document.createElement("li");
+        li.innerHTML = data;
+        tempBox.appendChild(li);
+      });
+      $UL.append(tempBox);
+    }
+
+    function splitList() {
+      if (size + 100 < myList.length) {
+        render(myList.slice(size, size + 100));
+        size += 100;
+        requestAnimationFrame(splitList);
+      } else {
+        render(myList.slice(size, size + myList.length - size));
+        size = myList.length - size;
+      }
+    }
+
+    requestAnimationFrame(splitList);
+  </script> -->
+  <script>
+    const $UL = document.getElementById("urlss");
+    let page_arg = {
+      size: 0,
+      count: 100,
+    };
+
+    const myList = getList();
+    $UL.onscroll = function () {
+      if (this.scrollTop + this.clientHeight + 10 >= this.scrollHeight) {
+        splitList();
+      }
+    };
+
+    // 生成数据
+    function getList() {
+      let list = [];
+      for (let i = 0; i < 10000000; i++) {
+        list.push("我是数据" + i);
+      }
+      return list;
+    }
+
+    function render(list) {
+      let tempBox = document.createDocumentFragment();
+      list.map(function (data) {
+        let li = document.createElement("li");
+        li.innerHTML = data;
+        tempBox.appendChild(li);
+      });
+      $UL.append(tempBox);
+    }
+
+    function splitList() {
+      render(myList.slice(page_arg.size, page_arg.size + page_arg.count));
+      page_arg.size += page_arg.count;
+    }
+
+    splitList();
+  </script>
+</html>

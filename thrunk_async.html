@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>thrunk函数</title>
+  </head>
+  <body>
+    <!-- https://www.jianshu.com/p/0f1b6ae1888c -->
+  </body>
+  <script>
+    const thunkify = (fn) => (...rest) => (callback) => fn(...rest, callback);
+  </script>
+  <script>
+    function getNum(num) {
+      return new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve(num + 1);
+        }, 1000);
+      });
+    }
+    var func = function* () {
+      var f1 = yield getNum(1);
+      var f2 = yield getNum(f1);
+      console.log(f1, f2);
+    };
+    //实现一个thrunk,达到传名调用
+    function asyncFun(func) {
+      const gen = func();
+      function next(data) {
+        const result = gen.next(data);
+        if (result.done) return result.value;
+        result.value.then(function (data) {
+          next(data);
+        });
+      }
+      next();
+      console.log(gen);
+    }
+    asyncFun(func);
+  </script>
+</html>

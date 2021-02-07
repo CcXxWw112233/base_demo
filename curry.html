@@ -1,49 +1,48 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-</head>
+  </head>
 
-<body>
-<!-- <div style="width: 100%; background: blue;">
+  <body>
+    <!-- <div style="width: 100%; background: blue;">
     <div class='content' style="margin: 0 au;"> 
         <div>交易</div>
         <div>原创</div>
         <div>版权</div>
     </div>
 </div> -->
-</body>
-<script type="text/javascript">
-    window.onload = function () {
-        function curry(fn, argLen, currArgs) {
-            return function () {
-                console.log("arguments:", arguments, arguments.length)
-                var args = [].slice.call(arguments);
-                console.log("args:", args)
-                // 首次调用时未提供最后一个参数
-                if (currArgs !== undefined) {
-                    args = args.concat(currArgs);
-                }
-                // 递归出口
-                if (args.length == argLen) {
-                    return fn.apply(this, args);
-                } else {
-                    return curry(fn, argLen, args);
-                }
-            }
-        }
+  </body>
+  <script type="text/javascript">
+    // 什么是函数柯里化？实现 sum(1)(2)(3) 返回结果是1,2,3之和
+    // 函数柯里化是把接受多个参数的函数变换成接受一个单一参数（最初函数的第一个参数）的函数，
+    // 并且返回接受余下的参数而且返回结果的新函数的技术。
 
-        function sumOf(a, b, c, d) {
-            return a + b + c + d;
+    function curry(fn, args = []) {
+      return function () {
+        const rest = [...args, ...arguments];
+        console.log({
+          fn_len: fn.length,
+          rest_len: rest.length,
+          rest,
+          fn,
+          args: [...args],
+          arguments: [...arguments]
+        });
+        if (rest.length < fn.length) {
+          return curry.call(this, fn, rest);
+        } else {
+          return fn.apply(this, rest);
         }
-
-        // 改造普通函数，返回柯里函数
-        var sum = curry(sumOf, 4);
-        sum(1,2)(3,4)
+      };
     }
-</script>
-
+    function sum(a, b, c) {
+      return a + b + c;
+    }
+    const sumfn = curry(sum);
+    // sumfn(14)(22)(3)(33)
+    console.log(sumfn(14)(22)(3));
+  </script>
 </html>

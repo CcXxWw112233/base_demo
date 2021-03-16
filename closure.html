@@ -1,27 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>闭包</title>
-</head>
+  </head>
 
-<body>
+  <body></body>
+  <script>
+    // function fn() {
+    //     let i = 1
+    //     return function () {
+    //         console.log(i ++)
+    //     }
+    // }
+    // const a = fn(3)
+    // const b = fn(4)
+    // a()
+    // a()
+    // b()
+    var b = 10;
+    (function b() {
+      b = 20;
+      console.log("sssssssss_0", b);
+    })();
+    console.log("sssssssss_1", b);
 
-</body>
-<script>
-    function fn() {
-        let i = 1
-        return function () {
-            console.log(i ++)
-        }
-    }
-    const a = fn(3)
-    const b = fn(4)
-    a()
-    a()
-    b()
-</script>
-
+  </script>
 </html>

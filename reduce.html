@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>reduce实现</title>
+  </head>
+  <body></body>
+  <script>
+    //   https://zhuanlan.zhihu.com/p/122456672
+    Array.prototype.myReduce = function (fn, initialValue) {
+      let acc = initialValue || this[0];
+      let startIndex = initialValue ? 0 : 1;
+      for (let i = startIndex; i < this.length; i++) {
+        acc = fn(acc, this[i], i, this);
+      }
+      return acc;
+    };
+
+    let arr = [1, 2, 3, 4, 5];
+    let res = arr.myReduce((pre, cur, i, arr) => {
+      return pre + cur;
+    }, 10);
+    console.log(res); //25
+  </script>
+</html>

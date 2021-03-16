@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>map 实现</title>
+  </head>
+  <body></body>
+  <script>
+    Array.prototype.m_map = function (fn) {
+      let result = [];
+      for (let index = 0; index < this.length; index++) {
+        const ele = this[index];
+        result.push(fn(ele, index, this));
+      }
+      return result;
+    };
+    const a = [1, 2, 3, 4].m_map((item, index, arr) => {
+      console.log(item, index, arr);
+      return item;
+    });
+    console.log(a);
+  </script>
+</html>

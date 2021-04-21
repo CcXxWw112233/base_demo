@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>分组排序</title>
+  </head>
+  <style>
+    .group {
+      width: 1000px;
+    }
+    .item {
+      height: 40px;
+    }
+  </style>
+  <body>
+    <div id="nice">
+      <div class="group">
+        <div class="item"></div>
+        <div class="item"></div>
+      </div>
+    </div>
+  </body>
+  <script>
+    const ceil_width = 40;
+    const ceil_height = 40;
+    /**
+     * 默认将数据源的每个分组的child将时间先后顺序排好。
+     * 由于child[0]是最早的那个， child[0]的row为基准一定是1
+     * data_source为初步处理后的数据
+     */
+    const data_source = [
+      {
+        list_id: "1",
+        child: [
+          { name: "1", start_index: 2, width: 3, row: 1 }, // => row = 1
+          { name: "2", start_index: 4, width: 4, row: "" }, // =>row = 2
+          { name: "3", start_index: 5, width: 5, row: "" }, // =>row = 1
+          { name: "4", start_index: 9, width: 4, row: "" }, // =>row = 2
+        ],
+      },
+      {
+        list_id: "2",
+        child: [
+          { name: "1", start_index: 2, width: 3, row: 1 }, // => row = 1
+          { name: "2", start_index: 4, width: 4, row: "" }, // =>row = 2
+          { name: "3", start_index: 5, width: 5, row: "" }, // =>row = 1
+          { name: "4", start_index: 9, width: 4, row: "" }, // =>row = 2
+        ],
+      },
+    ];
+
+    for (let val of data_source) {
+      const { child = [] } = val;
+      const child_len = child.length;
+      //   {
+      //     1: [2, 5], //该行的区间以存在
+      //   }
+      let rows_has_map = {
+        1: [child[0].start_index, child[0].start_index + child[0].width],
+      };
+      const rows = Object.keys(rows_has_map).map((item) => Number(item));
+      //冒泡child, 因为 i=0时已经确认row=1,所以从i=1开始
+      for (let i = 1; i < child_len; i++) {
+        let row_seted = false; //该元素是否已经设置上行
+        for (let key in rows_has_map) {
+          if (child[i].start_index >= rows_has_map[key][1]) {
+            child[i].row = Number(key);
+            // 设置上了之后，将右区间取最大值
+            rows_has_map[key][1] = Math.max.apply(null, [
+              rows_has_map[key][1],
+              child[i].start_index + child[i].width,
+            ]);
+            //设置行的标致变为true
+            row_seted = true;
+            break;
+          }
+        }
+        // 如果在已存在的行上，都不符合设置位置的条件,则新增一行
+        if (!row_seted) {
+          child[i].row = rows.length + 1;
+          rows_has_map[rows.length + 1] = [
+            child[i].start_index,
+            child[i].start_index + child[i].width,
+          ];
+        }
+      }
+    }
+
+    console.log(data_source);
+  </script>
+</html>

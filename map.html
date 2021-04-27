@@ -16,10 +16,22 @@
       }
       return result;
     };
+    Array.prototype.m_filter = function (fn) {
+      let result = [];
+      for (let index = 0; index < this.length; index++) {
+        const ele = this[index];
+        if (fn(ele)) {
+          result.push(fn(ele, index, this));
+        }
+      }
+      return result;
+    };
     const a = [1, 2, 3, 4].m_map((item, index, arr) => {
-      console.log(item, index, arr);
+      // console.log(item, index, arr);
       return item;
     });
+    const b = [1, 2, 3, 4].filter((item) => item <= 2);
     console.log(a);
+    console.log(b);
   </script>
 </html>

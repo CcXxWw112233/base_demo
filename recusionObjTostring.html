@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>处理对象扁平成简单对象</title>
+  </head>
+  <body></body>
+  <script>
+    // 实现一个 fn 函数
+    const o = { a: 1, b: [1, 2, { c: true }], d: { e: 2, f: 3 }, g: null };
+    //  fn(o)
+    //  =>
+    //  { "a": 1, "b[0]": 1, "b[1]": 2, "b[2].c": true, "d.e": 2, ... }
+  </script>
+</html>

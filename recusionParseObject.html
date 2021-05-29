@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>递归解析对象</title>
+  </head>
+  <body></body>
+  <script>
+    // 实现一个 fn 函数
+    const o = { a: 1, b: [1, 2, { c: true }], d: { e: 2, f: 3 }, g: null };
+    //  fn(o)
+    //  =>
+    //  { "a": 1, "b[0]": 1, "b[1]": 2, "b[2].c": true, "d.e": 2, ... }
+    let _obj = {};
+    function checkValiType(value, type) {
+      return Object.prototype.toString.call(value) === type;
+    }
+    function fn(object, subfix) {
+      for (let key in object) {
+        if (checkValiType(object[key], "[object Object]")) {
+          for (let key2 in object[key]) {
+            const _obj_key = `${subfix}${key}.${key2}`;
+            _obj[_obj_key] = object[key][key2];
+            if (
+              checkValiType(object[key][key2], "[object Array]") ||
+              checkValiType(object[key][key2], "[object Object]")
+            ) {
+              fn(object[key][key2]);
+            }
+          }
+        } else if (checkValiType(object[key], "[object Array]")) {
+          for (let key2 in object[key]) {
+            let _obj_key = `${key}[${key2}]`;
+            _obj[_obj_key] = object[key][key2];
+            if (
+              checkValiType(object[key][key2], "[object Array]") ||
+              checkValiType(object[key][key2], "[object Object]")
+            ) {
+              fn(object[key][key2], _obj_key);
+            }
+          }
+        } else {
+          _obj[key] = object[key];
+        }
+      }
+    }
+    fn(o)
+    console.log(_obj)
+  </script>
+</html>

@@ -22,9 +22,8 @@
     var b = 10;
     (function b() {
       b = 20;
-      console.log("sssssssss_0", b);
+      console.log(b); //=>function b() { ... }
     })();
-    console.log("sssssssss_1", b);
-
+    console.log(b); // => 10
   </script>
 </html>

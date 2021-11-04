@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>太阳系</title>
+    <style>
+      body {
+        margin: 0;
+        overflow: hidden;
+      }
+    </style>
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/build/three.min.js"></script>
+    <script src="http://www.yanhuangxueyuan.com/versions/threejsR92/examples/js/controls/OrbitControls.js"></script>
+  </head>
+
+  <body></body>
+
+  <script>
+    const {
+      Scene,
+      TextureLoader,
+      SphereGeometry,
+      MeshBasicMaterial,
+      DoubleSide,
+      Mesh,
+      OrthographicCamera,
+      PointLight,
+      AmbientLight,
+      WebGLRenderer,
+      Group,
+      Clock,
+      ArcCurve,
+      Geometry,
+      LineBasicMaterial,
+      LineLoop,
+      ParticleBasicMaterial,
+      ParticleSystem,
+      Vector3,
+      Color
+    } = THREE;
+    function data() {
+      let K = 5;
+      return {
+        sun: {
+          name: "太阳",
+          R: 10 * K,
+          URL: "./贴图/太阳.jpg",
+        },
+
+        planet: [
+          {
+            name: "水星",
+            R: 2.5 * K,
+            URL: "./贴图/水星.jpg",
+            revolutionR: 20 * K,
+          },
+          {
+            name: "金星",
+            R: 3 * K,
+            URL: "./贴图/金星.jpg",
+            revolutionR: 30 * K,
+          },
+          {
+            name: "地球",
+            R: 3.2 * K,
+            URL: "./贴图/地球.jpg",
+            revolutionR: 40 * K,
+          },
+          {
+            name: "火星",
+            R: 2.5 * K,
+            URL: "./贴图/火星.jpg",
+            revolutionR: 50 * K,
+          },
+          {
+            name: "木星",
+            R: 5 * K,
+            URL: "./贴图/木星.jpg",
+            revolutionR: 60 * K,
+          },
+          {
+            name: "土星",
+            sphere: {
+              R: 3.5 * K,
+              URL: "./贴图/土星.jpg",
+            },
+            ring: {
+              r: 4 * K,
+              R: 6 * K,
+              URL: "./贴图/土星环.jpg",
+            },
+            revolutionR: 70 * K,
+          },
+          {
+            name: "天王星",
+            sphere: {
+              R: 3.5 * K,
+              URL: "./贴图/天王星.jpg",
+            },
+            ring: {
+              r: 4 * K,
+              R: 6 * K,
+              URL: "./贴图/天王星环.jpg",
+            },
+            revolutionR: 80 * K,
+          },
+          {
+            name: "海王星",
+            R: 4 * K,
+            URL: "./贴图/海王星.jpg",
+            revolutionR: 100 * K,
+          },
+        ],
+
+        ringPlanet: [],
+
+        moon: {
+          R: K,
+          URL: "tu.png",
+          revolutionR: 10 * K,
+        },
+      };
+    }
+    const scene = new Scene();
+    const cloud = cloudFun()
+    scene.add(cloud)
+    const texLoader = new TextureLoader();
+    const Data = data();
+    const sun = createSphereMesh(Data.sun.R, Data.sun.URL);
+    sun.name = Data.sun.name;
+    scene.add(sun);
+    const planetGroup = new Group();
+    scene.add(planetGroup);
+
+    Data.planet.forEach((obj, index) => {
+      let planet = null;
+      if (obj.ring) {
+        planet = createSphereMesh(obj.sphere.R, obj.sphere.URL);
+      } else {
+        planet = createSphereMesh(obj.R, obj.URL);
+      }
+      planet.revolutionR = obj.revolutionR;
+      planet.name = obj.name;
+      planet.angle = 2 * Math.PI * Math.random();
+      planetGroup.add(planet);
+      const line = circle(obj.revolutionR);
+      scene.add(line);
+    });
+
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    const k = width / height;
+    const s = 310;
+
+    const camera = new OrthographicCamera(-s * k, s * k, s, -s, 1, 1500);
+    camera.position.set(651, 613, 525);
+    camera.lookAt(scene.position);
+
+    const point = new PointLight(0xffffff);
+    point.position.set(400, 200, 300);
+    scene.add(point);
+
+    const ambient = new AmbientLight(0x444444);
+    scene.add(ambient);
+
+    const renderer = new WebGLRenderer({
+      antialias: true,
+    });
+    renderer.setSize(width, height);
+    renderer.setClearColor(0x101010, 1);
+    document.body.appendChild(renderer.domElement);
+
+    // 定义一个创建球体函数
+    function createSphereMesh(R, URL) {
+      const geometry = new SphereGeometry(R, 100, 100);
+      return createMesh(geometry, URL);
+    }
+    // 定义一个创建材质函数
+    function createMesh(geometry, URL) {
+      const meterial = new MeshBasicMaterial({
+        map: texLoader.load(URL),
+        side: DoubleSide,
+      });
+      const mesh = new Mesh(geometry, meterial);
+      return mesh;
+    }
+    // 创建运行轨迹环形弧线
+    function circle(r) {
+      const arc = new ArcCurve(0, 0, r, 0, 2 * Math.PI, true);
+      const points = arc.getPoints(50);
+      const geometry = new Geometry();
+      geometry.setFromPoints(points);
+      const meterial = new LineBasicMaterial({ color: 0x222222 });
+      const line = new LineLoop(geometry, meterial)
+      line.rotateX(Math.PI / 2)
+      return line
+    }
+    // 创建星云
+    function cloudFun() {
+      const geometry = new Geometry();
+      const material = new ParticleBasicMaterial({
+        size: 0.01,
+        vertexColors: true,
+      })
+      const n = 1200
+      for (let i = 0; i < 3000; i ++) {
+        var particle = new Vector3(
+          (Math.random() - 0.5) * n,
+          (Math.random() - 0.5) * n,
+          (Math.random() - 0.5) * n
+        );
+        geometry.vertices.push(particle)
+        let color_k = Math.random();
+        geometry.colors.push(new Color(color_k, color_k, color_k * 0.6));
+      }
+      const cloud = new ParticleSystem(geometry, material); // 粒子系统
+      return cloud
+    }
+
+    // 定义渲染逻辑
+    const clock = new Clock();
+    const FPS = 30;
+    const refreshTime = 1 / FPS;
+    let timeS = 0;
+    function render() {
+      const renderInterval = clock.getDelta();
+      timeS = timeS + renderInterval;
+      if (timeS > refreshTime) {
+        renderer.render(scene, camera);
+        timeS = 0;
+      }
+      sun.rotation.y += 0.01;
+      planetGroup.children.forEach(function (obj, index) {
+        obj.rotation.y += 0.01; //设置自转
+        obj.angle += (0.005 / obj.revolutionR) * 400; //设置公转
+        if (obj.name === "地球") {
+          console.log(obj.revolutionR, obj.angle);
+        }
+        obj.position.set(
+          obj.revolutionR * Math.sin(obj.angle),
+          0,
+          obj.revolutionR * Math.cos(obj.angle)
+        );
+      });
+      requestAnimationFrame(render);
+    }
+    render();
+    var controls = new THREE.OrbitControls(camera, renderer.domElement);
+  </script>
+</html>

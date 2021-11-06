@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chrome memory 测试</title>
+  </head>
+  <body></body>
+  <script>
+    var arr = [];
+    function process() {
+      var count = 9000000;
+      for (var i = 0; i < count; i++) {
+        arr[i] = i;
+      }
+      console.log("s_0", arr.length);
+    }
+    var start = new Date().getTime();
+    process();
+    var end = new Date().getTime();
+    console.log("s_1", end - start);
+  </script>
+  <!-- https://blog.csdn.net/weixin_44109811/article/details/106116727 -->
+</html>

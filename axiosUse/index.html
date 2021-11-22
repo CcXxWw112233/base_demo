@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.bootcss.com/qs/6.7.0/qs.min.js"></script>
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="./cacheUtils.js"></script>
+    <script src="./request.js"></script>
+
+    <title>axios 请求取消</title>
+  </head>
+  <body></body>
+  <script>
+    //参考自 https://mp.weixin.qq.com/s/_j45Zd-d_2vYyo5vTTDpGg
+    const qs = Qs;
+    axiosRequest.get("https://unpkg.com/axios/dist/axios.min.js", {
+      params: {
+        name: "new name",
+        phone: "new phone",
+      },
+    });
+    setTimeout(() => {
+      axiosRequest.get("https://unpkg.com/axios/dist/axios.min.js", {
+        params: {
+          name: "new namse",
+          phone: "new phone",
+        },
+      });
+    }, 60);
+  </script>
+</html>

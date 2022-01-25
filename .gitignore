@@ -97,3 +97,5 @@ src/pages/search/chart/clj-chart.*
 .vscode/
 
 src/static/robots.txt
+
+/.parcel-cache/

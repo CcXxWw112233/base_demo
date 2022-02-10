@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, user-scalabel=no,viewport-fit=cover"
+  />
+  <meta content=" no-cache,must-revalidate" http-equiv="Cache-Control" />
+  <meta content="no-cache" http-equiv="pragma" />
+  <!--清除浏览器缓存-->
+  <meta content="0" http-equiv="expires" />
+  <meta content="telephone=no, address=no" name="format-detection" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <!-- apple devices fullscreen -->
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  />
+  <style>
+    html {
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    body {
+      padding: 0;
+      margin: 0;
+      height: 100%;
+      max-width: 100%;
+      overflow: hidden;
+      font-family: "PingFangSC-Regular", "PingFangSC-Light", "PingFang SC",
+        sans-serif, "Microsoft YaHei";
+    }
+  </style>
+
+  <body>
+    <div class="seeTree-page" id="app">
+      <div id="treeRoot"></div>
+    </div>
+
+    <script src="jquery-3.1.1.min.js" charset="utf-8"></script>
+    <script src="d3.v5.js" charset="utf-8"></script>
+    <script src="vue.min.js"></script>
+    <script>
+      var u = navigator.userAgent,
+        app = navigator.appVersion;
+      var isAndroid = u.indexOf("Android") > -1 || u.indexOf("Linux") > -1; //g
+      var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      var ua = navigator.userAgent.toLowerCase();
+      var ualower = navigator.userAgent.toLocaleLowerCase();
+      //var treeData =
+      var width = document.body.clientWidth,
+        height = document.body.clientHeight;
+      var toggle = true,
+        circlewidth1,
+        circlewidth2,
+        circlewidth3;
+      var margin1 = { top: 50, right: 20, bottom: -20, left: 0 };
+
+      var vm = new Vue({
+        el: "#app",
+        data: {
+          container: null, //容器svg>g
+          duration: 500, //动画持续时间
+          scaleRange: [0.2, 2], //container缩放范围
+          direction: ["r", "l"], //分为左右2个方向
+          centralPoint: [0, 0], //画布中心点坐标x,y
+          root: { r: {}, l: {} }, //左右2块数据源
+          rootNodeLength: 0, //根节点名称长度
+          rootName: ["平安银行", ""], //根节点名称
+          textSpace: 15, //多行文字间距
+          themeColor: "#2196F3", //主色
+          nodeSize: [50, 50], //节点间距(高/水平)
+          fontSize: 13, //字体大小，也是单字所占宽高
+          rectMinWidth: 50, //节点方框默认最小，
+          textPadding: 5, //文字与方框间距,注：固定值5
+          circleR: 5, //圆圈半径
+          dirRight: "",
+          treeData: [],
+          forUpwardNew: "",
+        },
+        computed: {
+          treeMap() {
+            return d3
+              .tree()
+              .nodeSize(this.nodeSize)
+              .separation((a, b) => {
+                let result =
+                  a.parent === b.parent && !a.children && !b.children ? 1 : 2;
+
+                return result;
+              });
+          },
+        },
+        mounted() {
+          this.getData();
+        },
+
+        methods: {
+          getData() {
+            var mynodes;
+            $.ajax({
+              url: "./first.json",
+              contentType: "application/json;charset=UTF-8",
+              type: "get",
+              dataType: "json",
+
+              success: function (data) {
+                let left = data.l,
+                  right = data.r;
+                let mynodes;
+
+                // for (var i = 0; i < left.children.length; i++) {
+                //   if (left.children[i].children.length > 2) {
+                //     mynodes = left.children[i].children;
+                //     left.children[i].children = left.children[i].children.slice(
+                //       0,
+                //       2
+                //     );
+                //     left.children[i].children[2] = {
+                //       name: "更多",
+                //       type: -1,
+                //       val: mynodes.length - 2,
+                //       childrend: mynodes.slice(0, mynodes.length),
+                //     };
+                //   }
+                // }
+                // for (var i = 0; i < right.children.length; i++) {
+                //   if (right.children[i].children.length > 2) {
+                //     mynodes = right.children[i].children;
+                //     right.children[i].children = right.children[
+                //       i
+                //     ].children.slice(0, 2);
+                //     right.children[i].children[2] = {
+                //       name: "更多",
+                //       type: -1,
+                //       val: mynodes.length - 2,
+                //       childrend: mynodes.slice(0, mynodes.length),
+                //     };
+                //   }
+                // }
+                vm.treeInit(data);
+              },
+            });
+          },
+
+          uuid() {
+            function s4() {
+              return Math.floor((1 + Math.random()) * 0x10000)
+                .toString(16)
+                .substring(1);
+            }
+
+            return (
+              s4() +
+              s4() +
+              "-" +
+              s4() +
+              "-" +
+              s4() +
+              "-" +
+              s4() +
+              "-" +
+              s4() +
+              s4() +
+              s4()
+            );
+          },
+
+          //初始化
+          treeInit(data) {
+            const margin = { top: 0, right: 0, bottom: 0, left: 0 };
+            const treeWidth =
+              document.body.clientWidth - margin.left - margin.right; //tree容器宽
+            const treeHeight =
+              document.body.clientHeight - margin.top - margin.bottom; //tree容器高
+            const centralY = treeWidth / 2 + margin.left;
+            const centralX = treeHeight / 2 + margin.top;
+            this.centralPoint = [centralX, centralY]; //中心点坐标
+
+            //根节点字符所占宽度
+            this.rootNodeLength = this.rootName[0].length * this.fontSize + 50;
+
+            //svg标签
+            svg = d3
+              .select("#treeRoot")
+              .append("svg")
+              .attr("class", "tree-svg")
+              .attr("xmlns", "http://www.w3.org/2000/svg")
+              .attr("width", treeWidth)
+              .attr("height", treeHeight)
+              .attr("font-size", this.fontSize)
+              .attr("fill", "#555");
+            //g标签
+            this.container = svg
+              .append("g")
+              .attr("class", "container1")
+              .attr(
+                "transform",
+                "translate(" + margin1.left + "," + margin1.top + ")scale(0.8)"
+              );
+            //画出根节点
+            this.drawRoot();
+            //指定缩放范围
+            const zoom = d3
+              .zoom()
+              .scaleExtent(this.scaleRange)
+              .on("zoom", this.zoomFn);
+            //动画持续时间
+            this.container
+              .transition()
+              .duration(this.duration)
+              .call(zoom.transform, d3.zoomIdentity);
+            svg.call(zoom);
+            //数据处理
+            this.dealData(data);
+          },
+
+          zoomFn() {
+            var weizhi = document.getElementsByClassName("container1")[0];
+
+            weizhi.style.transform = ""; //偏移位置
+            zoom = d3.event.transform;
+            return this.container.attr(
+              "transform",
+              "translate(" +
+                (Number(zoom.x) + Number(margin1.left)) +
+                "," +
+                (zoom.y + margin1.top) +
+                ")scale(" +
+                zoom.k * 0.8 +
+                ")"
+            );
+          },
+          //数据重组
+          DataReor(d, direction, source, appendData) {
+            var setDepth = function (node, num, appendLeaf) {
+              //重新设置depth
+
+              node.depth = num;
+              if (node.children && node.children.length) {
+                //遍历children
+                node.children.forEach(function (item) {
+                  setDepth(item, num + 1, appendLeaf);
+                });
+              } else {
+                appendLeaf.push(node);
+              }
+            };
+
+            var setHeight = function (arr, num) {
+              //重新设置height
+              var parent = [];
+              arr.forEach(function (node) {
+                node.height = Math.max(num, node.height);
+                if (node.parent && parent.indexOf(node.parent) == -1) {
+                  parent.push(node.parent);
+                }
+              });
+
+              if (parent.length) {
+                setHeight(parent, num + 1);
+              }
+            };
+
+            var appendLeaf = []; //增加的叶子节点
+
+            if (appendData.children.length) {
+              d.children = [];
+              appendData.children.forEach(function (item, index) {
+                var newNode = d3.hierarchy(item);
+                newNode.parent = d;
+                newNode.height = -1;
+                setDepth(newNode, d.depth + 1, appendLeaf);
+                d.children.push(newNode);
+              });
+            }
+
+            if (appendLeaf.length) {
+              setHeight(appendLeaf, 0);
+            }
+
+            if (source.data.name == "更多") {
+              source.parent.descendants().forEach((d) => {
+                d._children = d.children;
+                d.id = direction + this.uuid();
+              });
+            } else {
+              source.descendants().forEach((d) => {
+                d._children = d.children;
+                d.id = direction + this.uuid();
+              });
+            }
+            this.update(d, direction);
+          },
+          getNode(d, direction, source, type) {
+            var mynodes;
+            if (!d.data.isNextNode && d.data.type != -1) {
+              return;
+            }
+            if (d.data.name == "更多") {
+              console.log(d.parent.children.length);
+              var num = d.data.val / 5;
+              if (num <= 5) {
+                var arr = d.data.childrend;
+              } else {
+                var arr = d.data.childrend.slice(
+                  0,
+                  d.parent.children.length + 4
+                );
+                arr[d.parent.children.length + 4] = {
+                  nodeName: "更多",
+                  type: -1,
+                  val: d.data.childrend.length - d.parent.children.length + 4,
+                  childrend: d.data.childrend,
+                };
+              }
+
+              var appendData = {
+                children: arr,
+              };
+              this.DataReor(d.parent, direction, source, appendData);
+            } else if (type == 1) {
+              var appendData = {
+                children: [],
+              };
+              this.DataReor(d, direction, source, appendData);
+            } else {
+              //请求数据
+              $.ajax({
+                url: "",
+                data: JSON.stringify(d.data.request),
+                contentType: "application/json;charset=UTF-8",
+                type: "POST",
+                dataType: "json",
+                beforeSend: function () {
+                  $("#loading,.shaow").show();
+                },
+                success: function (data) {
+                  var data = data.data;
+                  $("#loading,.shaow").hide();
+                  if (data.length == 0) {
+                    html =
+                      '<div class="tk"><p style="font-size: 14px;color: #359ffb">' +
+                      d.data.name +
+                      "</p><span>暂无数据</span></div>";
+                    $(".shaow").show();
+                    $("body").append(html);
+                    return;
+                  }
+                  mynodes = data;
+                  if (data.length > 10) {
+                    data = data.slice(0, 10);
+
+                    data[11] = {
+                      name: "更多",
+                      type: -1,
+                      val: mynodes.length - 10,
+                      childrend: mynodes.slice(0, mynodes.length),
+                    };
+                  }
+
+                  var appendData = {
+                    children: data,
+                  };
+
+                  vm.DataReor(d, direction, source, appendData);
+                },
+              });
+            }
+          },
+          //数据处理
+          dealData(data) {
+            this.direction.forEach((item, index) => {
+              this.root[item] = d3.hierarchy(data[item]); // 转化为Node节点
+              this.root[item].x0 = this.centralPoint[0]; //根节点x坐标
+              this.root[item].y0 = this.centralPoint[1]; //根节点Y坐标
+              this.porData(this.root[item], item);
+            });
+          },
+          //遍历
+          porData(obj, item) {
+            // 扁平化再遍历
+            obj.descendants().forEach((d) => {
+              d._children = d.children;
+              d.id = item + this.uuid();
+            });
+            this.update(obj, item);
+          },
+          //画根节点
+          drawRoot() {
+            const title = this.container
+              .append("g")
+              .attr("id", "rootTitle")
+              .attr(
+                "transform",
+                `translate(${this.centralPoint[1]},${this.centralPoint[0]})`
+              );
+            title
+              .append("svg:rect")
+              .attr("class", "rootTitle")
+              .attr("y", 0)
+              .attr("x", -this.rootNodeLength / 2)
+              .attr("width", this.rootNodeLength)
+              .attr("height", 0)
+              .attr("rx", 5) //圆角
+              .style("fill", this.themeColor);
+            this.rootName.forEach((name, index) => {
+              title
+                .append("text")
+                .attr("fill", "white")
+                .attr("y", function () {
+                  return 5;
+                })
+                .attr("text-anchor", "middle")
+                .style("font-size", function () {
+                  if (index == 1) {
+                    return "10px";
+                  } else {
+                    return "15px";
+                  }
+                })
+                .text(name);
+
+              let lineHeight = (index + 2) * this.textSpace;
+              d3.select("#rootTitle rect")
+                .attr("height", lineHeight)
+                .attr("y", -lineHeight / 2);
+            });
+          },
+          seat(newArr, dirRight, data) {
+            for (var j = 0; j < newArr.length; j++) {
+              if (j != 0) {
+                if (j == 1) {
+                  for (var i = 0; i < data[j].length; i++) {
+                    data[j][i].y = data[j - 1][0].y + newArr[j - 1] + 10;
+                  }
+                } else {
+                  for (var i = 0; i < data[j].length; i++) {
+                    data[j][i].y = data[j - 1][0].y + newArr[j - 1] - 20;
+                  }
+                }
+              }
+            }
+          },
+          testLength(data, dirRight) {
+            var level = [],
+              width1,
+              width2;
+
+            for (var i = 0; i < data.length; i++) {
+              var newArr = new Array();
+
+              for (var j = 0; j < data[i].length; j++) {
+                if (data[i][j].data.attName) {
+                  svg
+                    .append("text")
+                    .style("font-size", this.fontSize)
+                    .text((d) => "(" + data[i][j].data.attName + ")")
+                    .attr("class", "test")
+                    .attr("width", function (d) {
+                      width3 = d3.select(this.getComputedTextLength())
+                        ._groups[0][0];
+                      console.log(width3);
+                    });
+                }
+                if (data[i][j].data.value) {
+                  svg
+                    .append("text")
+                    .style("font-size", this.fontSize)
+                    .text(function (d) {
+                      const len = data[i][j].data.name.length;
+                      if (len > 20) {
+                        return data[i][j].data.name.substring(0, 20) + "...";
+                      } else {
+                        return data[i][j].data.name;
+                      }
+                    })
+                    .attr("class", "test")
+                    .attr("width", function (d) {
+                      width1 = d3.select(this.getComputedTextLength())
+                        ._groups[0][0];
+                    });
+                  svg
+                    .append("text")
+                    .style("font-size", this.fontSize)
+                    .text((d) => data[i][j].data.value)
+                    .attr("class", "test")
+                    .attr("width", function (d) {
+                      width2 = d3.select(this.getComputedTextLength())
+                        ._groups[0][0];
+                    });
+
+                  $(".test").remove();
+                  if (data[i][j].data.attName) {
+                    if (Number(width1) + Number(width3) > Number(width2)) {
+                      newArr.push(Number(width1) + Number(width3) + 100);
+                    } else {
+                      newArr.push(Number(width2) + 100);
+                    }
+                  } else {
+                    if (Number(width1) > Number(width2)) {
+                      newArr.push(Number(width1) + 100);
+                    } else {
+                      newArr.push(Number(width2) + 100);
+                    }
+                  }
+                } else {
+                  svg
+                    .append("text")
+                    .style("font-size", this.fontSize)
+                    .text(function (d) {
+                      if (data[i][j].data.name) {
+                        const len = data[i][j].data.name.length;
+                        if (len > 20) {
+                          return data[i][j].data.name.substring(0, 20) + "...";
+                        } else {
+                          return data[i][j].data.name;
+                        }
+                      }
+                    })
+                    .attr("class", "test")
+                    .attr("width", function (d) {
+                      width1 = d3.select(this.getComputedTextLength())
+                        ._groups[0];
+
+                      newArr.push(Number(width1) + 100);
+                      data.width1 = d3.select(
+                        this.getComputedTextLength()
+                      )._groups[0];
+                    });
+                  $(".test").remove();
+                }
+              }
+              level.push(Math.max.apply(null, newArr));
+            }
+
+            this.seat(level, dirRight, data);
+          },
+
+          //开始绘图
+          update(source, direction) {
+            console.log("ssssss_0", source, direction);
+            const dirRight = direction === "r" ? 1 : -1; //方向为右/左
+            const forUpward = direction == "r";
+            vm.forUpwardNew = forUpward;
+            className = `${direction}gNode`;
+            console.log("ssssss_1", this.root[direction])
+            // return
+            tree = this.treeMap(this.root[direction]);
+            console.log("ssssss_2", tree);
+            nodes = tree.descendants();
+            links = tree.links();
+            let data = [];
+            if (nodes.length > 1) {
+              for (let i = 0; i < nodes.length; i++) {
+                if (!data[nodes[i].depth]) {
+                  let arr = [];
+                  arr.push(nodes[i]);
+                  data[nodes[i].depth] = arr;
+                } else {
+                  data[nodes[i].depth].push(nodes[i]);
+                }
+              }
+              //检测最大长度
+              this.testLength(data, dirRight);
+            }
+            debugger
+            nodes.forEach((d) => {
+              d.y =
+                dirRight * (d.y + this.rootNodeLength / 2) +
+                this.centralPoint[1];
+              d.x = d.x + this.centralPoint[0];
+            });
+
+            //根据class名称获取左或者右的g节点，达到分块更新
+            const node = this.container
+              .selectAll(`g.${className}`)
+              .data(nodes, (d) => d.id);
+            console.log("ssssss_3", nodes);
+            //新增节点，tree会根据数据内的children扩展相关节点
+            const nodeEnter = node
+              .enter()
+              .append("g")
+              .attr("id", (d) => `g${d.id}`)
+              .attr("class", className)
+              .attr("transform", (d) => `translate(${source.y0},${source.x0})`)
+              .attr("fill-opacity", 0)
+              .attr("stroke-opacity", 0)
+              .on("click", function (d) {
+                d3.select(this)
+                  .selectAll(".node-circle .node-circle-vertical")
+                  .transition()
+                  .duration(this.duration)
+                  .attr("stroke-width", function (d) {
+                    if (d.children) {
+                      return 1;
+                    } else {
+                      return 0;
+                    }
+                  });
+
+                if (d.data.name == "更多") {
+                  return vm.clickNode(d, direction, source);
+                } else if (d.depth !== 0) {
+                  return vm.clickNode(d, direction, source);
+                }
+              });
+            nodeEnter.each((d) => {
+              if (d.depth > 0) {
+                this.drawText(`g${d.id}`, dirRight);
+                if (d.data.attName) {
+                  this.drawCodeText(`g${d.id}`, dirRight);
+                }
+                if (d.data.value) {
+                  this.drawTsText(`g${d.id}`, dirRight);
+                }
+
+                this.drawRect(`g${d.id}`, dirRight);
+                this.marker(`g${d.id}`, dirRight);
+              }
+
+              if (d.depth > 0) {
+                const width = Math.min(
+                  d.data.name.length * 14,
+                  this.rectMinWidth
+                );
+                let right = dirRight > 0;
+                let xDistance = right ? width : -width;
+                this.drawCircle(`g${d.id}`, dirRight, source, direction);
+                this.drawSign(`g${d.id}`, dirRight); //画标记
+              }
+
+              //画节点数量
+              if (d.data.type == -1) {
+                this.drawLength(`g${d.id}`, dirRight);
+              }
+            });
+
+            // 更新节点：节点enter和exit时都会触发tree更新
+            const nodeUpdate = node
+              .merge(nodeEnter)
+              .transition()
+              .duration(this.duration)
+              .attr("transform", function (d) {
+                if (d.data.isNextNode) {
+                  d3.select(this)
+                    .selectAll(".node-circle .node-circle-vertical")
+                    .transition()
+                    .duration(this.duration)
+                    .attr("stroke-width", function (d) {
+                      if (d.children) {
+                        return 0;
+                      } else {
+                        return 1;
+                      }
+                    });
+                }
+
+                var index = 0;
+
+                return "translate(" + d.y + "," + d.x + ")";
+              })
+              .attr("fill-opacity", 1)
+              .attr("stroke-opacity", 1);
+
+            // 移除节点:tree移除掉数据内不包含的节点(即，children = false)
+            const nodeExit = node
+              .exit()
+              .transition()
+              .duration(this.duration)
+              .remove()
+              .attr("transform", (d) => `translate(${source.y},${source.x})`)
+              .attr("fill-opacity", 0)
+              .attr("stroke-opacity", 0);
+
+            // Update the links 根据 className来实现分块更新
+            const link = this.container
+              .selectAll(`path.${className}`)
+              .data(links, (d) => d.target.id);
+
+            // Enter any new links at the parent's previous position.
+            //insert是在g标签前面插入，防止连接线挡住G节点内容
+            const linkEnter = link
+              .enter()
+              .insert("path", "g")
+              .attr("class", className)
+              .attr("d", (d) => {
+                const o = { x: source.x0, y: source.y0 };
+
+                return this.diagonal({ source: o, target: o });
+              })
+              .attr("fill", "none")
+              .attr("stroke-width", 0.5)
+              .attr("stroke", "#D8D8D8");
+
+            // Transition links to their new position.
+            link
+              .merge(linkEnter)
+              .transition()
+              .duration(this.duration)
+              .attr("d", this.diagonal);
+
+            // Transition exiting nodes to the parent's new position.
+            link
+              .exit()
+              .transition()
+              .duration(this.duration)
+              .remove()
+              .attr("d", (d) => {
+                const o = { x: source.x, y: source.y };
+
+                return this.diagonal({ source: o, target: o });
+              });
+
+            // Stash the old positions for transition.
+            this.root[direction].eachBefore((d) => {
+              d.x0 = d.x;
+              d.y0 = d.y;
+            });
+            debugger
+          },
+          //画连接线
+          diagonal({ source, target }) {
+            let s = source,
+              d = target;
+
+            if (vm.forUpwardNew) {
+              return (
+                "M" +
+                s.y +
+                "," +
+                s.x +
+                "L" +
+                (s.y + (d.y - s.y) - 20) +
+                "," +
+                s.x +
+                "L" +
+                (s.y + (d.y - s.y) - 20) +
+                "," +
+                d.x +
+                "L" +
+                d.y +
+                "," +
+                d.x
+              );
+            } else {
+              return (
+                "M" +
+                s.y +
+                "," +
+                s.x +
+                "L" +
+                (s.y + (d.y - s.y) + 20) +
+                "," +
+                s.x +
+                "L" +
+                (s.y + (d.y - s.y) + 20) +
+                "," +
+                d.x +
+                "L" +
+                d.y +
+                "," +
+                d.x
+              );
+            }
+          },
+
+          //画箭头
+          marker(id, dirRight) {
+            let gMark = d3
+              .select(`#${id}`)
+              .append("g")
+              .attr(
+                "transform",
+                dirRight > 0 ? "translate(-20,0)" : "translate(12,0)"
+              );
+            return gMark
+              .insert("path", "text")
+
+              .attr("d", function (d) {
+                if (d.data.nodeType == 0 && dirRight > 0) {
+                  return "M0,0L0,3L9,0L0,-3Z";
+                } else if (d.data.nodeType == 0 && dirRight < 0) {
+                  return "M0,0L9,-3L9,3Z";
+                }
+              })
+              .style("fill", (d) => this.getRectStorke(d.data.name));
+          },
+
+          //华标记
+          drawSign(id, dirRight) {
+            console.log(dirRight);
+            return d3
+              .select(`#${id}`)
+              .insert("circle", "text")
+              .attr("cx", dirRight > 0 ? -5 : 5)
+              .attr("y", -2.5)
+              .attr("r", function (d) {
+                if (d.data.nodeType == 0) {
+                  return 4;
+                }
+              })
+              .style("fill", (d) => this.getRectStorke(d.data.name));
+          },
+          //画文本
+          drawText(id, dirRight) {
+            dirRight = dirRight > 0; //右为1，左为-1
+            return d3
+              .select(`#${id}`)
+              .append("text")
+              .attr("y", function (d) {
+                if (d.data.value) {
+                  return vm.textPadding - 8;
+                } else {
+                  return vm.textPadding;
+                }
+              })
+              .attr("x", (d) =>
+                dirRight ? this.textPadding : -this.textPadding
+              )
+              .attr("text-anchor", dirRight ? "start" : "end")
+              .style("font-size", this.fontSize)
+              .text(function (d) {
+                const len = d.data.name.length;
+                if (len > 20) {
+                  return d.data.name.substring(0, 20) + "...";
+                } else {
+                  return d.data.name;
+                }
+              })
+              .attr("fill", function (d) {
+                if (d.data.nodeType == -1) {
+                  return "rgb(33, 150, 243)";
+                } else if (d.data.nodeType == 0 || d.data.attName) {
+                  return "#fff";
+                } else {
+                  return "#333";
+                }
+              })
+
+              .attr("width", function (d) {
+                circlewidth1 = d3.select(this.getComputedTextLength())
+                  ._groups[0][0];
+                return d3.select(this.getComputedTextLength())._groups[0][0];
+              });
+          },
+          //画子文本
+          drawTsText(id, dirRight) {
+            return d3
+              .select(`#${id} text`)
+              .append("tspan")
+              .attr("fill", (d) => (d.data.attName ? "#fff" : "#999"))
+              .attr("y", function (d) {
+                if (d.data.value) {
+                  return vm.textPadding + 8;
+                }
+              })
+              .attr("x", function (d) {
+                if (dirRight > 0) {
+                  return vm.textPadding;
+                } else {
+                  return -5;
+                }
+              })
+              .style("font-size", "11px")
+              .text(function (d) {
+                return d.data.value;
+              })
+
+              .attr("width", function (d) {
+                circlewidth2 = d3.select(this.getComputedTextLength())
+                  ._groups[0][0];
+                return d3.select(this.getComputedTextLength())._groups[0][0];
+              });
+          },
+          //画股票代码
+          drawCodeText(id, dirRight) {
+            return d3
+              .select(`#${id} text`)
+              .append("tspan")
+              .attr("fill", (d) => "#fff")
+              .attr("y", function (d) {
+                if (d.data.value) {
+                  return vm.textPadding + 8;
+                }
+              })
+              .style("font-size", "11px")
+              .attr("x", function (d) {
+                if (dirRight > 0) {
+                  return vm.textPadding;
+                } else {
+                  return -5;
+                }
+              })
+              .text(function (d) {
+                return d.data.attName + " ";
+              })
+
+              .attr("width", function (d) {
+                circlewidth3 = d3.select(this.getComputedTextLength())
+                  ._groups[0][0];
+                return d3.select(this.getComputedTextLength())._groups[0][0];
+              });
+          },
+          //节点数量
+          drawLength(id) {
+            return d3
+              .select(`#${id} text`)
+              .append("tspan")
+              .attr("fill", (d) => "#999")
+              .text(function (d) {
+                if (d.data.type == -1) {
+                  return " (" + d.data.val + ")";
+                }
+                return " [" + d.data.value + "]";
+              })
+              .attr("fill", "rgb(33, 150, 243)")
+              .attr("width", function (d) {
+                return d3.select(this.getComputedTextLength())._groups[0];
+              });
+          },
+          //画方框阴影
+          drawFilter(id) {
+            return d3
+              .select(`#${id}`)
+              .insert("defs", "rect")
+              .append("filter")
+              .attr("id", `f${id}`)
+              .attr("x", 0)
+              .attr("y", 0)
+              .append("feGaussianBlur")
+              .attr("in", "SourceGraphic")
+              .attr("stdDeviation", "5");
+          },
+
+          //画方框
+          drawRect(id, dirRight) {
+            let realw = document.getElementById(id).getBBox().width + 25; //获取g实际宽度后，设置rect宽度
+            if (document.getElementById(id).getBBox().width > 400) {
+              realw = 400;
+            }
+
+            return d3
+              .select(`#${id}`)
+              .insert("rect", "text")
+              .attr("x", function (d) {
+                if (dirRight < 0) {
+                  return -realw;
+                } else {
+                  0;
+                }
+              })
+              .attr("y", function (d) {
+                if (d.data.value) {
+                  return -vm.textSpace + vm.textPadding - 11;
+                } else {
+                  return -vm.textSpace + vm.textPadding - 4;
+                }
+              })
+              .attr("width", function (d) {
+                // if (d.data.isNextNode) {//判断是否有下级节点
+                //     return realw
+                // } else {
+                //     return realw - 15
+                // }
+                return realw;
+              })
+              .attr("height", function (d) {
+                if (d.data.value) {
+                  return vm.textSpace + vm.textPadding + 22;
+                } else {
+                  return vm.textSpace + vm.textPadding + 8;
+                }
+              })
+              .attr("stroke-width", (d) =>
+                d.data.nodeType == 0 || d.data.type == -1 || d.data.attName
+                  ? 0
+                  : 0.5
+              )
+              .attr("rx", 2) //圆角
+
+              .style("stroke", (d) =>
+                d.data.nodeType == -1
+                  ? ""
+                  : this.getRectStorke(d.parent.data.name)
+              )
+              .style("fill", function (d) {
+                if (d.data.nodeType == -1) {
+                  return "rgb(241, 241, 241)";
+                } else if (d.data.nodeType == 0) {
+                  return vm.getRectStorke(d.data.name);
+                } else if (d.data.attName) {
+                  return "rgb(33, 150, 243)";
+                } else {
+                  return "#fff";
+                }
+              });
+          },
+
+          //画circle
+          drawCircle(id, dirRight, source, direction) {
+            let gMark = d3
+              .select(`#${id}`)
+              .append("g")
+              .attr("class", "node-circle")
+              .attr("stroke", "rgb(153, 153, 153)")
+              .attr("transform", function (d) {
+                if (d.data.value) {
+                  if (circlewidth1 > circlewidth2) {
+                    leng = Number(circlewidth1) + 15;
+                  } else {
+                    leng = Number(circlewidth2) + 15;
+                  }
+
+                  //leng = Number(circlewidth1) + Number(circlewidth2) + 25;
+                  if (leng > 390) {
+                    leng = 390;
+                  }
+                  if (dirRight == 1) {
+                    return "translate(" + leng + ",0)";
+                  } else {
+                    return "translate(" + -leng + ",0)";
+                  }
+                } else {
+                  leng = Number(circlewidth1) + 15;
+                  if (dirRight == 1) {
+                    return "translate(" + leng + ",0)";
+                  } else {
+                    return "translate(" + -leng + ",0)";
+                  }
+                }
+              })
+              // .attr('stroke-width', d => d.data.isNextNode ? 1 : 0);   判断是否有下级节点
+              .attr("stroke-width", (d) => (d.data.type == "-1" ? 0 : 1));
+
+            gMark
+              .append("circle")
+              .attr("fill", "none")
+              .attr("r", function (d) {
+                if (d.data.type == "-1") {
+                  return 0;
+                }
+                return 5;
+              }) //根节点不设置圆圈
+              .attr("fill", "#ffffff");
+            let padding = this.circleR - 2;
+
+            gMark
+              .append("path")
+              .attr("d", `m -${padding} 0 l ${2 * padding} 0`); //横线
+
+            gMark
+              .append("path") //竖线，根据展开/收缩动态控制显示
+              .attr("d", `m 0 -${padding} l 0 ${2 * padding}`)
+              .attr("stroke-width", function (d) {
+                if (d.data.type == "-1") {
+                  return 0;
+                }
+                return 1;
+              })
+              .attr("class", "node-circle-vertical");
+            return gMark;
+          },
+
+          //点击某个节点
+          // clickNode(d, direction, source) {
+          //     if (d.children) {
+
+          //         d._children = d.children;
+          //         d.children = null;
+
+          //         this.getNode(d, direction, source, 1)
+          //     } else {
+          //         d.children = d._children;
+          //         d._children = [];
+
+          //         //this.getNode(d, direction, source);
+
+          //     }
+
+          //     if (d.data.name == "更多") {
+          //         this.getNode(d, direction, source)
+          //         return;
+          //     }
+          //     //this.update(d, direction);
+          // },
+          expand(d, direction, source) {
+            if (d.data.name == "更多") {
+              this.getNode(d, direction, source);
+              return;
+            }
+            if (d._children) {
+              d.children = d._children;
+
+              d._children = null;
+              this.update(d, direction);
+            }
+          },
+
+          collapse(d, direction, obj) {
+            if (d.children) {
+              d._children = d.children;
+              d.children = null;
+              console.log(d._children);
+            }
+            if (obj == 1) {
+              this.update(d, direction);
+            }
+          },
+
+          //点击某个节点
+          clickNode(d, direction, source) {
+            if (d.children || d.children) {
+              vm.collapse(d, direction, 1);
+            } else {
+              vm.expand(d, direction, source);
+            }
+          },
+          getTsTextColor(name) {
+            switch (name) {
+              case "股东":
+                return "darkgray";
+              case "供应商":
+                return "#FF9800";
+              case "合伙人":
+                return "green";
+              default:
+                return "black";
+            }
+          },
+          //末 节点 边框颜色
+          getRectStorke(name) {
+            switch (name) {
+              case "十大股东":
+                return "#F47F00";
+              case "十大流通股东":
+                return "#02355A";
+              case "高管":
+                return "#78B29A";
+              case "对外投资":
+                return "#812F62";
+
+              case "股东":
+                return "#7D4B32";
+              case "法人":
+                return "#54174D";
+              case "客户":
+                return "rgb(18, 139, 237)";
+              default:
+                return "rgb(133, 165, 255)";
+            }
+          },
+          isNull(val) {
+            return val ? val : "";
+          },
+        },
+      });
+    </script>
+  </body>
+</head>

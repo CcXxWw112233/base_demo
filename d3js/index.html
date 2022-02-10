@@ -44,22 +44,22 @@
     <script src="d3.v5.js" charset="utf-8"></script>
     <script src="vue.min.js"></script>
     <script>
-      var u = navigator.userAgent,
+      let u = navigator.userAgent,
         app = navigator.appVersion;
-      var isAndroid = u.indexOf("Android") > -1 || u.indexOf("Linux") > -1; //g
-      var isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
-      var ua = navigator.userAgent.toLowerCase();
-      var ualower = navigator.userAgent.toLocaleLowerCase();
-      //var treeData =
-      var width = document.body.clientWidth,
+      let isAndroid = u.indexOf("Android") > -1 || u.indexOf("Linux") > -1; //g
+      let isIOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/); //ios终端
+      let ua = navigator.userAgent.toLowerCase();
+      let ualower = navigator.userAgent.toLocaleLowerCase();
+      //let treeData =
+      let width = document.body.clientWidth,
         height = document.body.clientHeight;
-      var toggle = true,
+      let toggle = true,
         circlewidth1,
         circlewidth2,
         circlewidth3;
-      var margin1 = { top: 50, right: 20, bottom: -20, left: 0 };
+      let margin1 = { top: 50, right: 20, bottom: -20, left: 0 };
 
-      var vm = new Vue({
+      let vm = new Vue({
         el: "#app",
         data: {
           container: null, //容器svg>g
@@ -100,7 +100,7 @@
 
         methods: {
           getData() {
-            var mynodes;
+            let mynodes;
             $.ajax({
               url: "./first.json",
               contentType: "application/json;charset=UTF-8",
@@ -112,7 +112,7 @@
                   right = data.r;
                 let mynodes;
 
-                // for (var i = 0; i < left.children.length; i++) {
+                // for (let i = 0; i < left.children.length; i++) {
                 //   if (left.children[i].children.length > 2) {
                 //     mynodes = left.children[i].children;
                 //     left.children[i].children = left.children[i].children.slice(
@@ -127,7 +127,7 @@
                 //     };
                 //   }
                 // }
-                // for (var i = 0; i < right.children.length; i++) {
+                // for (let i = 0; i < right.children.length; i++) {
                 //   if (right.children[i].children.length > 2) {
                 //     mynodes = right.children[i].children;
                 //     right.children[i].children = right.children[
@@ -219,7 +219,7 @@
           },
 
           zoomFn() {
-            var weizhi = document.getElementsByClassName("container1")[0];
+            let weizhi = document.getElementsByClassName("container1")[0];
 
             weizhi.style.transform = ""; //偏移位置
             zoom = d3.event.transform;
@@ -236,7 +236,7 @@
           },
           //数据重组
           DataReor(d, direction, source, appendData) {
-            var setDepth = function (node, num, appendLeaf) {
+            let setDepth = function (node, num, appendLeaf) {
               //重新设置depth
 
               node.depth = num;
@@ -250,9 +250,9 @@
               }
             };
 
-            var setHeight = function (arr, num) {
+            let setHeight = function (arr, num) {
               //重新设置height
-              var parent = [];
+              let parent = [];
               arr.forEach(function (node) {
                 node.height = Math.max(num, node.height);
                 if (node.parent && parent.indexOf(node.parent) == -1) {
@@ -265,12 +265,12 @@
               }
             };
 
-            var appendLeaf = []; //增加的叶子节点
+            let appendLeaf = []; //增加的叶子节点
 
             if (appendData.children.length) {
               d.children = [];
               appendData.children.forEach(function (item, index) {
-                var newNode = d3.hierarchy(item);
+                let newNode = d3.hierarchy(item);
                 newNode.parent = d;
                 newNode.height = -1;
                 setDepth(newNode, d.depth + 1, appendLeaf);
@@ -296,17 +296,17 @@
             this.update(d, direction);
           },
           getNode(d, direction, source, type) {
-            var mynodes;
+            let mynodes;
             if (!d.data.isNextNode && d.data.type != -1) {
               return;
             }
             if (d.data.name == "更多") {
               console.log(d.parent.children.length);
-              var num = d.data.val / 5;
+              let num = d.data.val / 5;
               if (num <= 5) {
-                var arr = d.data.childrend;
+                let arr = d.data.childrend;
               } else {
-                var arr = d.data.childrend.slice(
+                let arr = d.data.childrend.slice(
                   0,
                   d.parent.children.length + 4
                 );
@@ -318,12 +318,12 @@
                 };
               }
 
-              var appendData = {
+              let appendData = {
                 children: arr,
               };
               this.DataReor(d.parent, direction, source, appendData);
             } else if (type == 1) {
-              var appendData = {
+              let appendData = {
                 children: [],
               };
               this.DataReor(d, direction, source, appendData);
@@ -338,8 +338,8 @@
                 beforeSend: function () {
                   $("#loading,.shaow").show();
                 },
-                success: function (data) {
-                  var data = data.data;
+                success: function (res) {
+                  let data = res.data;
                   $("#loading,.shaow").hide();
                   if (data.length == 0) {
                     html =
@@ -362,7 +362,7 @@
                     };
                   }
 
-                  var appendData = {
+                  let appendData = {
                     children: data,
                   };
 
@@ -431,14 +431,14 @@
             });
           },
           seat(newArr, dirRight, data) {
-            for (var j = 0; j < newArr.length; j++) {
+            for (let j = 0; j < newArr.length; j++) {
               if (j != 0) {
                 if (j == 1) {
-                  for (var i = 0; i < data[j].length; i++) {
+                  for (let i = 0; i < data[j].length; i++) {
                     data[j][i].y = data[j - 1][0].y + newArr[j - 1] + 10;
                   }
                 } else {
-                  for (var i = 0; i < data[j].length; i++) {
+                  for (let i = 0; i < data[j].length; i++) {
                     data[j][i].y = data[j - 1][0].y + newArr[j - 1] - 20;
                   }
                 }
@@ -446,14 +446,14 @@
             }
           },
           testLength(data, dirRight) {
-            var level = [],
+            let level = [],
               width1,
               width2;
 
-            for (var i = 0; i < data.length; i++) {
-              var newArr = new Array();
+            for (let i = 0; i < data.length; i++) {
+              let newArr = new Array();
 
-              for (var j = 0; j < data[i].length; j++) {
+              for (let j = 0; j < data[i].length; j++) {
                 if (data[i][j].data.attName) {
                   svg
                     .append("text")
@@ -659,7 +659,7 @@
                     });
                 }
 
-                var index = 0;
+                let index = 0;
 
                 return "translate(" + d.y + "," + d.x + ")";
               })

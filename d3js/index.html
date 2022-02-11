@@ -112,35 +112,35 @@
                   right = data.r;
                 let mynodes;
 
-                // for (let i = 0; i < left.children.length; i++) {
-                //   if (left.children[i].children.length > 2) {
-                //     mynodes = left.children[i].children;
-                //     left.children[i].children = left.children[i].children.slice(
-                //       0,
-                //       2
-                //     );
-                //     left.children[i].children[2] = {
-                //       name: "更多",
-                //       type: -1,
-                //       val: mynodes.length - 2,
-                //       childrend: mynodes.slice(0, mynodes.length),
-                //     };
-                //   }
-                // }
-                // for (let i = 0; i < right.children.length; i++) {
-                //   if (right.children[i].children.length > 2) {
-                //     mynodes = right.children[i].children;
-                //     right.children[i].children = right.children[
-                //       i
-                //     ].children.slice(0, 2);
-                //     right.children[i].children[2] = {
-                //       name: "更多",
-                //       type: -1,
-                //       val: mynodes.length - 2,
-                //       childrend: mynodes.slice(0, mynodes.length),
-                //     };
-                //   }
-                // }
+                for (let i = 0; i < left.children.length; i++) {
+                  if (left.children[i].children.length > 2) {
+                    mynodes = left.children[i].children;
+                    left.children[i].children = left.children[i].children.slice(
+                      0,
+                      2
+                    );
+                    left.children[i].children[2] = {
+                      name: "更多",
+                      type: -1,
+                      val: mynodes.length - 2,
+                      childrend: mynodes.slice(0, mynodes.length),
+                    };
+                  }
+                }
+                for (let i = 0; i < right.children.length; i++) {
+                  if (right.children[i].children.length > 2) {
+                    mynodes = right.children[i].children;
+                    right.children[i].children = right.children[
+                      i
+                    ].children.slice(0, 2);
+                    right.children[i].children[2] = {
+                      name: "更多",
+                      type: -1,
+                      val: mynodes.length - 2,
+                      childrend: mynodes.slice(0, mynodes.length),
+                    };
+                  }
+                }
                 vm.treeInit(data);
               },
             });
@@ -303,10 +303,11 @@
             if (d.data.name == "更多") {
               console.log(d.parent.children.length);
               let num = d.data.val / 5;
+              let arr = []
               if (num <= 5) {
-                let arr = d.data.childrend;
+                arr = d.data.childrend;
               } else {
-                let arr = d.data.childrend.slice(
+                arr = d.data.childrend.slice(
                   0,
                   d.parent.children.length + 4
                 );
@@ -567,7 +568,6 @@
               //检测最大长度
               this.testLength(data, dirRight);
             }
-            debugger
             nodes.forEach((d) => {
               d.y =
                 dirRight * (d.y + this.rootNodeLength / 2) +
@@ -720,7 +720,6 @@
               d.x0 = d.x;
               d.y0 = d.y;
             });
-            debugger
           },
           //画连接线
           diagonal({ source, target }) {
@@ -1033,7 +1032,7 @@
                   }
                 }
               })
-              // .attr('stroke-width', d => d.data.isNextNode ? 1 : 0);   判断是否有下级节点
+              // .attr('stroke-width', d => d.data.isNextNode ? 1 : 0);   //判断是否有下级节点
               .attr("stroke-width", (d) => (d.data.type == "-1" ? 0 : 1));
 
             gMark
@@ -1065,28 +1064,6 @@
             return gMark;
           },
 
-          //点击某个节点
-          // clickNode(d, direction, source) {
-          //     if (d.children) {
-
-          //         d._children = d.children;
-          //         d.children = null;
-
-          //         this.getNode(d, direction, source, 1)
-          //     } else {
-          //         d.children = d._children;
-          //         d._children = [];
-
-          //         //this.getNode(d, direction, source);
-
-          //     }
-
-          //     if (d.data.name == "更多") {
-          //         this.getNode(d, direction, source)
-          //         return;
-          //     }
-          //     //this.update(d, direction);
-          // },
           expand(d, direction, source) {
             if (d.data.name == "更多") {
               this.getNode(d, direction, source);

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chrome memory 测试</title>
+  </head>
+  <style>
+    .number {
+      position: absolute;
+      color: blue;
+      top: 300px;
+      font-size: 26px;
+      left: calc(50% - 13px);
+    }
+  </style>
+  <body>
+    <button id="start">开始</button>
+    <button id="pause">暂停</button>
+
+    <video ref="videoElem" style="width: 100%" id="videoElem">
+      <source src="./hongbao.mp4" type="video/mp4" />
+    </video>
+    <div class="number">3</div>
+  </body>
+  <script>
+    window.onload = function () {
+      var videoElem = document.getElementById("videoElem");
+      document.getElementById("start").addEventListener("click", function () {
+        videoElem.play();
+      });
+      document.getElementById("pause").addEventListener("click", function () {
+        videoElem.pause();
+      });
+    };
+  </script>
+</html>

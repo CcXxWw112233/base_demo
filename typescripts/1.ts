@@ -28,3 +28,28 @@ const c: b = {
   name: '1',
   age: 2
 }
+function a(aa:Number, b: string): string {
+  return '1'
+}
+interface AF {
+  aas: '1'
+  [p: string]: string
+}
+function A<AF>(args: AF): AF {
+  return args
+}
+let B:<T>(arg:T) => T 
+window.requestIdleCallback =
+  window.requestIdleCallback ||
+  function (handler) {
+    let startTime = Date.now();
+
+    return setTimeout(function () {
+      handler({
+        didTimeout: false,
+        timeRemaining: function () {
+          return Math.max(0, 50.0 - (Date.now() - startTime));
+        },
+      });
+    }, 1);
+  };

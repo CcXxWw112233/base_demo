@@ -99,3 +99,5 @@ src/pages/search/chart/clj-chart.*
 src/static/robots.txt
 
 /.parcel-cache/
+
+.history

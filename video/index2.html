@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>chrome memory 测试</title>
+  </head>
+  <style>
+    body {
+      height: 700px;
+      padding: 100px;
+    }
+    /* 定义动画名称和关键帧 */
+    @keyframes slide {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position:  0 -14084px;  /* 雪碧图总高度14784px, 视窗高度700px, 相减结果*/
+      }
+    }
+
+    /* 应用动画到目标元素 */
+    .animated-element {
+      width: 600px; 
+      height: 700px; /*最终按照设计稿来*/
+      background-image: url("./hongbao2.png"); 
+      background-repeat: no-repeat; 
+      background-position: 0 0;
+      animation: slide 1s steps(20) forwards; /* 案例稿子总共21张集合，减去1*/
+      background-size: 100%;  
+    }
+  </style>
+  <body>
+    <div class="animated-element" id="ele">
+    </div>
+  </body>
+  <script>
+
+  </script>
+</html>
